@@ -15,6 +15,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate
     @IBOutlet weak var mapView: MKMapView!
     let locationManager = CLLocationManager()
     var currentLocation: CLLocation!
+    var parks:[MKMapItem] = []
     
     override func viewDidLoad()
     {
@@ -37,7 +38,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate
         mapView.setRegion(region, animated: true)
     }
     
-    @IBAction func whenSearchPressed(_ sender: Any) {
+    @IBAction func whenSearchPressed(_ sender: Any)
+    {
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = "parks"
+        let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+        request.region = MKCoordinateRegion(center: currentLocation.coordinate, span: span)
+        let search = MKLocalSearch(request: request)
+        search.start { (response, error) in
+            <#code#>
+        }
     }
     
     
