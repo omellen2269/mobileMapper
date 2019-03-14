@@ -31,8 +31,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView?
     {
-        if annotation.isEqual(mapView.userLocation)
-        {
+        if annotation.isEqual(mapView.userLocation) {
             return nil
         }
         let pin = MKPinAnnotationView(annotation: annotation, reuseIdentifier: nil)
@@ -40,6 +39,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         let button = UIButton(type: .detailDisclosure)
         pin.rightCalloutAccessoryView = button
         return pin
+    }
+    
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+        var currentMapItem = MKMapItem()
+        if let title = view.annotation?.title, let parkName = title {
+            for mapItem in parks {
+                if mapItem.name == parkName {
+                    currentMapItem = mapItem
+                }
+            }
+        }
+        let placeMark = currentMapItem.placemark
+        print(placeMark)
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
