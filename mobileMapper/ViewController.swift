@@ -16,7 +16,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     let locationManager = CLLocationManager()
     var currentLocation: CLLocation!
     var parks: [MKMapItem] = []
+    var initialRegion: MKCoordinateRegion!
+    var isIntialMapLoad = true
     
+    func mapViewDidFinishLoadingMap(_ mapView: MKMapView) {
+        if isIntialMapLoad {
+            initialRegion = MKCoordinateRegion(center: mapView.centerCoordinate, span: mapView.region.span)
+            isIntialMapLoad = false
+        }
+    }
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -38,10 +46,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         pin.canShowCallout = true
         let button = UIButton(type: .detailDisclosure)
         pin.rightCalloutAccessoryView = button
+        let zoomButton = UIButton(type: .contactAdd)
+        pin.leftCalloutAccessoryView = zoomButton
         return pin
     }
     
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+        let button = control as! UIButton
+        if button.buttonType == .contactAdd {
+            mapView.setRegion(initialRegion, animated: true)
+        }
         var currentMapItem = MKMapItem()
         if let title = view.annotation?.title, let parkName = title {
             for mapItem in parks {
@@ -50,9 +64,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                 }
             }
         }
-        let placeMark = currentMapItem.placemark
-        print(placeMark)
+        //let placeMark = currentMapItem.placemark
+        //print(placeMark)
+        if let phoneNumber = currentMapItem.phoneNumber {
+            createAlert(phoneNumber)
+        }
     }
+    
+    func createAlert(_ phoneNumber: String) {
+        let alert = UIAlertController(title: "Phone Number", message: phoneNumber, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+        alert.addAction(cancelAction)
+        present(alert, animated: true, completion: nil)
+    }
+    
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         currentLocation = locations[0]
